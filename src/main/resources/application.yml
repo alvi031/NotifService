@@ -15,12 +15,13 @@ spring:
     open-in-view: false
 
   liquibase:
-    change-log: classpath:db/changelog/db.changelog-master.yaml
+    changelog: classpath:db/changelog/db.changelog-master.yaml
 
-  kafka:
+  Kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
       group-id: notification-service
+      enable-auto-commit: false
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
@@ -28,3 +29,6 @@ spring:
         spring.json.value.default.type: org.example.notifservice.event.TaskEvent
         spring.json.trusted.packages: org.example.notifservice.event
         spring.json.use.type.headers: false
+        enable-auto-commit: false
+    listener:
+      ack-mode: record

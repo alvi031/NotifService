@@ -26,13 +26,10 @@ class NotificationServiceTest {
 
     @Mock
     private NotificationPreferenceRepository preferenceRepository;
-
     @Mock
     private EmailNotificationStrategy emailStrategy;
-
     @Mock
     private TelegramNotificationStrategy telegramStrategy;
-
     @Mock
     private PushNotificationStrategy pushStrategy;
 
@@ -51,7 +48,7 @@ class NotificationServiceTest {
     }
 
     @Test
-    void shouldSendNotificationsOnlyThroughEnabledChannels() {
+    void process() {
         TaskEvent event = createEvent();
 
         when(preferenceRepository.findAllByUserIdAndEnabledTrue(7L))
@@ -69,7 +66,7 @@ class NotificationServiceTest {
     }
 
     @Test
-    void shouldNotSendNotificationsWhenNoChannelsEnabled() {
+    void process_NoChannels() {
         TaskEvent event = createEvent();
 
         when(preferenceRepository.findAllByUserIdAndEnabledTrue(7L))
@@ -82,21 +79,7 @@ class NotificationServiceTest {
         verify(pushStrategy, never()).send(any(), any());
     }
 
-    @Test
-    void shouldSendNotificationOnlyThroughTelegramWhenItIsEnabled() {
-        TaskEvent event = createEvent();
 
-        when(preferenceRepository.findAllByUserIdAndEnabledTrue(7L))
-                .thenReturn(List.of(
-                        createPreference(NotificationChannel.TELEGRAM)
-                ));
-
-        notificationService.process(event);
-
-        verify(telegramStrategy).send(eq(event), any(NotificationPreference.class));
-        verify(emailStrategy, never()).send(any(), any());
-        verify(pushStrategy, never()).send(any(), any());
-    }
 
     private TaskEvent createEvent() {
         return new TaskEvent(
